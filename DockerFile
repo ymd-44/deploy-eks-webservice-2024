@@ -1,11 +1,7 @@
-FROM node:14-alpine
+FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install python3-pip -y && pip3 install flask==2.0.0
-	#Installation de Python dans le container = fonctionnement du serveur
+RUN apt update -y apt-get update && apt-get install python3-pip -y && pip3 install flask==2.0.0
 ADD server.py /my_server/server.py
-	#Ajout du fichier de création du serveur à l'image Docker
 WORKDIR /my_server/
-	#Changement du dossier courant à l'intérieur de l'image (fonctionne comme la commande "cd" sous Linux)
 EXPOSE 5000
-	#Précision que le port 5000 peut être atteint depuis l'extérieur du container si on en fait la demande
 CMD python3 server.py

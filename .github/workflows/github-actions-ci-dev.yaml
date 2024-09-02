@@ -1,0 +1,27 @@
+name: Déploiement container DEV 
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Code Checkout
+      uses: actions/checkout@v3
+
+    - name: Debug Information
+      uses: ./.github/actions/debug
+
+    - name: Build Docker image
+      run: docker build -t my_image:latest .
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Tag image
+      run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest

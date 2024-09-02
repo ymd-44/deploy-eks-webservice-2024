@@ -6,8 +6,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  #EKS_CLUSTER_NAME: ${{ vars.CLUSTER_NAME }}
   EKS_CLUSTER_NAME: eks-devops24
+  MY_NAMESPACE: projet-devops
 
 jobs:
   deploy:
@@ -33,13 +33,13 @@ jobs:
       run: aws eks update-kubeconfig --name ${{env.EKS_CLUSTER_NAME}} --region ${{env.AWS_REGION}}
 
 
-    - name: Vérifier si le namespace "projet-devops" existe
-      run: kubectl get namespace projet-devops -o json | jq '.metadata.name' | tee /tmp/namespace_count.txt
+    - name: Vérifier si le namespace "projet-devops" existe sinon le créer
+      run: kubectl get namespace | grep ${{env.MY_NAMESPACE}} || kubectl create namespace ${{env.MY_NAMESPACE}}
       if: ${{ always() }}
 
-    - name: Créer le namespace "projet-devops" si non existe
-      run: kubectl create namespace projet-devops
-      if: steps.Verify_Namespace_Exists.outputs.exitCode != 0
+    # - name: Créer le namespace "projet-devops" si non existe
+    #   run: kubectl create namespace projet-devops
+    #   if: steps.Verify_Namespace_Exists.outputs.exitCode != 0
 
     # - name: Supprimer la configuration Kubernetes existante (si présente)
     #   run: kubectl delete -k ./

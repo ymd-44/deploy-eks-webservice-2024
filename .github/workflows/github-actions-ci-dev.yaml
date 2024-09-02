@@ -10,9 +10,6 @@ jobs:
     - name: Code Checkout
       uses: actions/checkout@v3
 
-    - name: Debug Information
-      uses: ./.github/actions/debug
-
     - name: Build Docker image
       run: docker build -t my_image:latest .
 

@@ -1,11 +1,18 @@
-FROM ubuntu:18.04
+FROM python:3.8-alpine
 
-RUN apt update -y apt-get update && apt-get install python3-pip -y && pip3 install flask==2.0.0
+# copy the requirements file into the image
+COPY ./requirements.txt /app/requirements.txt
 
-ADD server.py /my_server/server.py
+# switch working directory
+WORKDIR /app
 
-WORKDIR /my_server/
+# install the dependencies and packages in the requirements file
+RUN pip install -r requirements.txt
 
-EXPOSE 5000
+# copy every content from the local file to the image
+COPY . /app
 
-CMD python3 server.py
+# configure the container to run in an executed manner
+ENTRYPOINT [ "python" ]
+
+CMD ["server.py" ]

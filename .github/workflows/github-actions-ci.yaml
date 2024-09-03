@@ -54,8 +54,8 @@ jobs:
     - name: Vérifier si le namespace "projet-devops" existe
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
       allow_failure:
-					exit_codes:
-					  - 1 # code 1 will be ignored
+       exit_codes:
+       - 1 # code 1 will be ignored
     
     - name: Nettoyage de la config Kubernetes existante
       run: kubectl delete namespace ${{env.MY_NAMESPACE}}

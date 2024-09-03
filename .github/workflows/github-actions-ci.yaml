@@ -31,9 +31,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    allow_failure:
-       exit_codes:
-       - 1 # code 1 will be ignored
     - name: Code Checkout
       uses: actions/checkout@v3
 
@@ -56,10 +53,12 @@ jobs:
 
     - name: Vérifier si le namespace "projet-devops" existe
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
+      if: ${{ success() || failure() }}
+      id: verify_namespace
     
     - name: Nettoyage de la config Kubernetes existante
       run: kubectl delete namespace ${{env.MY_NAMESPACE}}
-      if: steps.Verify_Namespace_Exists.outputs.exitCode == 0
+      if: steps.verify_namespace.outputs.exitCode == 0
 
     - name: Vérifier si le namespace "projet-devops" existe sinon le créer
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}} || kubectl create namespace ${{env.MY_NAMESPACE}}

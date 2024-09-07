@@ -66,5 +66,4 @@ jobs:
       if: ${{ always() }}
     
     - name: Deploy to EKS
-      run: |
-        kubectl apply -k ./
+      run: kubectl apply -k ./

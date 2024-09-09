@@ -55,7 +55,6 @@ jobs:
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
       if: ${{ always() }}
       id: verify
-      continue-on-error: true
     
     - name: Nettoyage de la config Kubernetes existante
       if: steps.verify.outputs.exitCode == 0

@@ -61,7 +61,6 @@ jobs:
       ##if: steps.verify.outputs.exitCode == 0
       if: success() || steps.verify.conclusion == 'failure'
       run: kubectl delete namespace ${{env.MY_NAMESPACE}}
-      continue-on-error: true
 
     - name: Vérifier si le namespace "projet-devops" existe sinon le créer
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}} || kubectl create namespace ${{env.MY_NAMESPACE}}

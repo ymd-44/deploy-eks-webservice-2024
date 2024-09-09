@@ -58,7 +58,8 @@ jobs:
       continue-on-error: true
     
     - name: Nettoyage de la config Kubernetes existante
-      if: steps.verify.outputs.exitCode == 0
+      ##if: steps.verify.outputs.exitCode == 0
+      if: success() || steps.verify.conclusion == 'failure'
       run: kubectl delete namespace ${{env.MY_NAMESPACE}}
       continue-on-error: true
 

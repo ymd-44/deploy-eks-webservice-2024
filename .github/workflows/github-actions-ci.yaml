@@ -53,7 +53,6 @@ jobs:
 
     - name: Vérifier si le namespace "projet-devops" existe
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
-      if: ${{ success() || failure() }}
       id: verify_namespace
       continue-on-error: true
     

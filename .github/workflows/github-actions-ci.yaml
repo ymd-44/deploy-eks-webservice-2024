@@ -37,7 +37,7 @@ jobs:
     - name: Install kubectl
       uses: azure/setup-kubectl@v2.0
       with:
-        version: 'v1.24.0' # latest stable
+        version: 'v1.24.0' #latest stable
       id: install
 
     - name: Configure AWS Credentials
@@ -53,12 +53,13 @@ jobs:
 
     - name: Vérifier si le namespace "projet-devops" existe
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
-      id: verify_namespace
+      if: ${{ always() }}
+      id: verify
       continue-on-error: true
     
     - name: Nettoyage de la config Kubernetes existante
+      if: steps.verify.outputs.exitCode == 0
       run: kubectl delete namespace ${{env.MY_NAMESPACE}}
-      if: steps.verify_namespace.conclusion == 'success'
 
     - name: Vérifier si le namespace "projet-devops" existe sinon le créer
       run: kubectl get namespace | grep ${{env.MY_NAMESPACE}} || kubectl create namespace ${{env.MY_NAMESPACE}}

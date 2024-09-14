@@ -71,7 +71,7 @@ kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
 
 kubectl get all -n kube-system
 
-## Déploiemnt de l'infrastructure dans le Cloud AWS
+## Déploiement de l'infrastructure dans le Cloud AWS
 - Execution du fichier ".ghithub\worklows\github-actions-ci.yaml"
 - Checks du pipeline dans le repo : https://github.com/ymd-44/deploy-eks-webservice-2024/actions
 

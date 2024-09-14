@@ -56,6 +56,9 @@ role_arn=$(aws iam list-roles --query "Roles[?RoleName=='AmazonEC2forEKSdevops']
 ## Installation du pilote EBS CSI
 eksctl create addon --name aws-ebs-csi-driver --cluster eks-devops24 --service-account-role-arn $role_arn --force
 
+## Cas d'erreur lors de l'installation 
+Ajout du plugin EBS CSI au rôle : https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html
+
 ## Déploiement du pilote EBS CSI en utilisant Helm
 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 helm repo update

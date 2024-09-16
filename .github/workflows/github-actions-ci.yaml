@@ -10,7 +10,7 @@ env:
   MY_NAMESPACE: projet-devops
 
 jobs:
-  production:
+  development:
     runs-on: ubuntu-latest
     steps:
     - name: Code Checkout
@@ -28,7 +28,7 @@ jobs:
       run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
-  deploy:
+  production:
     runs-on: ubuntu-latest
     steps:
     - name: Code Checkout

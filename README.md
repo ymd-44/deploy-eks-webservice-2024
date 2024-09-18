@@ -69,7 +69,7 @@ helm upgrade --install aws-ebs-csi-driver \
 ## Vérification des pods
 kubectl get pods -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
 
-kubectl get all -n kube-system
+kubectl get all -n kube- 
 
 ## Déploiement de l'infrastructure dans le Cloud AWS
 - Execution du fichier ".ghithub\worklows\github-actions-ci.yaml"

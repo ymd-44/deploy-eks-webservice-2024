@@ -42,11 +42,7 @@ jobs:
     script:
       - terraform init
       - terraform validate
-    stage: plan
-    script: 
       - terraform plan
-    stage: apply
-    script:
       - terraform apply --auto-approve
     steps:
     - name: Code Checkout

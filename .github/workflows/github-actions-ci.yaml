@@ -6,8 +6,14 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  EKS_CLUSTER_NAME: eks-devops24
+  EKS_CLUSTER_NAME: eks-devops24-cluster
   MY_NAMESPACE: projet-devops
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
 
 jobs:
   development:
@@ -30,6 +36,20 @@ jobs:
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
   production:
     runs-on: ubuntu-latest
+    image:
+      name: hashicorp/terraform:latest
+    stage: validate
+    script:
+      - terraform init
+      - terraform validate
+
+    stage: plan
+    script: 
+      - terraform plan
+
+    stage: apply
+    script:
+      - terraform apply --auto-approve
     steps:
     - name: Code Checkout
       uses: actions/checkout@v3
@@ -67,3 +87,7 @@ jobs:
     
     - name: Deploy to EKS
       run: kubectl apply -k ./
+
+    stage: destroy
+    script:
+      - terraform destroy

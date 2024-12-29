@@ -81,9 +81,3 @@ jobs:
     
     - name: Deploy to EKS
       run: kubectl apply -k ./
-
-    # image:
-    #   name: hashicorp/terraform:latest
-    # stage: destroy
-    # script:
-    #   - terraform destroy

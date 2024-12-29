@@ -34,8 +34,8 @@ jobs:
       run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
-  production:
-    runs-on: ubuntu-latest
+  
+  terraform: 
     image:
       name: hashicorp/terraform:latest
     stage: validate
@@ -44,6 +44,8 @@ jobs:
       - terraform validate
       - terraform plan
       - terraform apply --auto-approve
+  production:
+    runs-on: ubuntu-latest
     steps:
     - name: Code Checkout
       uses: actions/checkout@v3

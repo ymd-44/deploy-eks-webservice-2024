@@ -9,17 +9,12 @@ env:
   EKS_CLUSTER_NAME: eks-devops24-cluster
   MY_NAMESPACE: projet-devops
 
-stages:
-  - validate
-  - plan
-  - apply
-  - destroy
-
 jobs:
   build_iac: 
-    image:
-      name: hashicorp/terraform:latest
-      stage: validate
+    runs-on: ubuntu-latest
+    steps:
+    - name: validate Iac
+      uses: hashicorp/terraform:latest
       script:
         - terraform init
         - terraform validate

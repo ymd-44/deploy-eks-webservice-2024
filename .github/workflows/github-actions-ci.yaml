@@ -15,9 +15,9 @@ stages:
   - apply
   - destroy
 
-image:
-  name: hashicorp/terraform:latest
-  validate: 
+buildIac: 
+  image:
+    name: hashicorp/terraform:latest
     stage: validate
     script:
       - terraform init

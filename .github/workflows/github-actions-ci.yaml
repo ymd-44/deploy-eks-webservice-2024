@@ -9,17 +9,22 @@ env:
   EKS_CLUSTER_NAME: eks-devops24-cluster
   MY_NAMESPACE: projet-devops
 
-
-build: 
-  image:
-    name: hashicorp/terraform:latest
-    script:
-      - terraform init
-      - terraform validate
-      - terraform plan
-      - terraform apply --auto-approve
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
 
 jobs:
+  build_iac: 
+    image:
+      name: hashicorp/terraform:latest
+      stage: validate
+      script:
+        - terraform init
+        - terraform validate
+        - terraform plan
+        - terraform apply --auto-approve
   development:
     runs-on: ubuntu-latest
     steps:

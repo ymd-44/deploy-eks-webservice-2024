@@ -9,11 +9,6 @@ env:
   EKS_CLUSTER_NAME: eks-devops24-cluster
   MY_NAMESPACE: projet-devops
 
-stages:
-  - validate
-  - plan
-  - apply
-  - destroy
 
 build: 
   image:

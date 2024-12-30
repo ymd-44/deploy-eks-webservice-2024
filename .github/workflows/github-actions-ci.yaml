@@ -15,7 +15,7 @@ stages:
   - apply
   - destroy
 
-buildIac: 
+build: 
   image:
     name: hashicorp/terraform:latest
     stage: validate

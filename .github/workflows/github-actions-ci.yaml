@@ -18,7 +18,6 @@ stages:
 build: 
   image:
     name: hashicorp/terraform:latest
-    stage: validate
     script:
       - terraform init
       - terraform validate

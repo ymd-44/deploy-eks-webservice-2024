@@ -1,46 +1,41 @@
+---
 name: Deploiement App service web via EKS (dev/prod)
 on:
   push:
-    branches: [ "main" ]
-
-
+    branches:
+      - main
 env:
   AWS_REGION: us-east-1
   EKS_CLUSTER_NAME: eks-devops24-cluster
   MY_NAMESPACE: projet-devops
-
 image:
   name: hashicorp/terraform:light
   entrypoint:
-    - '/usr/bin/env'
-    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-    - 'AWS_SECRET_ACCESS_KEY=${'secrets.AWS_SECRET_ACCESS_KEY}'
-    - 'AWS_ACCESS_KEY_ID=${secrets.AWS_ACCESS_KEY_ID }' 
-    - 'AWS_DEFAULT_REGION=${AWS_REGION}'
-
+    - /usr/bin/env
+    - PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    - AWS_SECRET_ACCESS_KEY=${secrets.AWS_SECRET_ACCESS_KEY}
+    - AWS_ACCESS_KEY_ID=${secrets.AWS_ACCESS_KEY_ID }
+    - AWS_DEFAULT_REGION=${AWS_REGION}
 stages:
   - validate
   - plan
   - apply
   - destroy
-
 validate:
   stage: validate
   script:
     - terraform validate
   only:
     - branches
-
 plan:
   stage: plan
-   script:
+  script:
     - terraform plan
   only:
     - branches
-
 apply:
   stage: apply
-   script:
+  script:
     - terraform apply --auto-approve
   only:
     - branches
@@ -48,58 +43,50 @@ jobs:
   development:
     runs-on: ubuntu-latest
     steps:
-    - name: Code Checkout
-      uses: actions/checkout@v3
-
-    - name: Build Docker image
-      run: docker build -t my_image:latest .
-
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Tag image
-      run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
-    - name: Push Docker image
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
- 
+      - name: Code Checkout
+        uses: actions/checkout@v3
+      - name: Build Docker image
+        run: docker build -t my_image:latest .
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Tag image
+        run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME
+          }}/my_image:latest
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
   production:
     runs-on: ubuntu-latest
     steps:
-    - name: Code Checkout
-      uses: actions/checkout@v3
-
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v2.0
-      with:
-        version: 'v1.24.0' # latest stable
-      id: install
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{env.AWS_REGION}}
-
-    - name: Update kube config
-      run: aws eks update-kubeconfig --name ${{env.EKS_CLUSTER_NAME}} --region ${{env.AWS_REGION}}
-
-
-    - name: Vérifier si le namespace "projet-devops" existe
-      run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
-      if: ${{ always() }}
-      id: verify
-      continue-on-error: true
-    
-    - name: Nettoyage de la config Kubernetes existante
-      if: steps.verify.outcome == 'success'
-      run: kubectl delete namespace ${{env.MY_NAMESPACE}}
-
-    - name: Vérifier si le namespace "projet-devops" existe sinon le créer
-      run: kubectl get namespace | grep ${{env.MY_NAMESPACE}} || kubectl create namespace ${{env.MY_NAMESPACE}}
-      if: ${{ always() }}
-    
-    - name: Deploy to EKS
-      run: kubectl apply -k ./
+      - name: Code Checkout
+        uses: actions/checkout@v3
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v2.0
+        with:
+          version: v1.24.0
+        id: install
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{env.AWS_REGION}}
+      - name: Update kube config
+        run: aws eks update-kubeconfig --name ${{env.EKS_CLUSTER_NAME}} --region
+          ${{env.AWS_REGION}}
+      - name: Vérifier si le namespace "projet-devops" existe
+        run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
+        if: ${{ always() }}
+        id: verify
+        continue-on-error: true
+      - name: Nettoyage de la config Kubernetes existante
+        if: steps.verify.outcome == 'success'
+        run: kubectl delete namespace ${{env.MY_NAMESPACE}}
+      - name: Vérifier si le namespace "projet-devops" existe sinon le créer
+        run: kubectl get namespace | grep ${{env.MY_NAMESPACE}} || kubectl create
+          namespace ${{env.MY_NAMESPACE}}
+        if: ${{ always() }}
+      - name: Deploy to EKS
+        run: kubectl apply -k ./

@@ -9,17 +9,42 @@ env:
   EKS_CLUSTER_NAME: eks-devops24-cluster
   MY_NAMESPACE: projet-devops
 
+image:
+  name: hashicorp/terraform:light
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    - 'AWS_SECRET_ACCESS_KEY=${'secrets.AWS_SECRET_ACCESS_KEY}'
+    - 'AWS_ACCESS_KEY_ID=${secrets.AWS_ACCESS_KEY_ID }' 
+    - 'AWS_DEFAULT_REGION=${AWS_REGION}'
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+  only:
+    - branches
+
+plan:
+  stage: plan
+   script:
+    - terraform plan
+  only:
+    - branches
+
+apply:
+  stage: apply
+   script:
+    - terraform apply --auto-approve
+  only:
+    - branches
 jobs:
-  build_iac: 
-    runs-on: ubuntu-latest
-    steps:
-    - name: validate Iac
-      uses: hashicorp/terraform:latest
-      script:
-        - terraform init
-        - terraform validate
-        - terraform plan
-        - terraform apply --auto-approve
   development:
     runs-on: ubuntu-latest
     steps:

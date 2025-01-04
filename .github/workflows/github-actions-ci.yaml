@@ -74,6 +74,7 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
   production:
+    needs: terraform
     runs-on: ubuntu-latest
     steps:
       - name: Code Checkout

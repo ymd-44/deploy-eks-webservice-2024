@@ -92,13 +92,18 @@ resource "aws_iam_role" "workernodes" {
 resource "aws_eks_cluster" "eks-devops24" {
  name = "eks-devops24-cluster"
  role_arn = aws_iam_role.eks-iam-role.arn
+ version  = "1.31"
+
+ access_config {
+    authentication_mode = "API"
+  }
 
  vpc_config {
   subnet_ids = [var.subnet_id_1, var.subnet_id_2]
  }
 
  depends_on = [
-  aws_iam_role.eks-iam-role,
+  aws_iam_role.eks-iam-role, aws_iam_role_policy_attachment.AmazonEKSClusterPolicy,
  ]
 }
 

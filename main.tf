@@ -102,41 +102,6 @@ resource "aws_eks_cluster" "eks-devops24" {
  ]
 }
 
-# Définition des permissions EBS CSI au rôle crée (gestion des volumes EBS)
-module  "ebs_csi_driver_irsa" {
-      source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-      version = "~> 5.20"
-
-      role_name_prefix = "ebs-csi-driver-"
-
-      attach_ebs_csi_policy = true
-
-      oidc_providers = {
-        main = {
-          provider_arn               = aws_eks_cluster.eks-devops24.role_arn
-          namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-        }
-      }
-
-      tags = var.tags
-    }
-# Installation du pilote EBS CSI
-    module "eks_blueprints_addons" {
-      source  = "aws-ia/eks-blueprints-addons/aws"
-      version = "~> 1.1"
-
-      cluster_name      = aws_eks_cluster.eks-devops24.name
-      oidc_provider_arn = aws_eks_cluster.eks-devops24.role_arn
-
-      eks_addons = {
-        aws-ebs-csi-driver = {
-          most_recent              = true
-          service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
-        }
-      }
-    }
-
-
 #New : Création des nœuds de travail pour le cluster
 resource "aws_eks_node_group" "worker-node-group" {
   cluster_name  = aws_eks_cluster.eks-devops24.name

@@ -181,7 +181,7 @@ resource "aws_cloudwatch_dashboard" "demo-dashboard" {
         height = 3
 
         properties = {
-          markdown = "My Demo Dashboard"
+          markdown = "Dashboard EKS Datascientest"
         }
       },
       {

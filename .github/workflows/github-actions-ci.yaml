@@ -90,12 +90,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{env.AWS_REGION}}
+      
+      - name: Deplacer ancienne config Kubernetes
+        run: mv $HOME/.kube/config $HOME/.kube/config.old
       - name: Update kube config
         run: aws eks update-kubeconfig --name ${{env.EKS_CLUSTER_NAME}} --region
           ${{env.AWS_REGION}}
-
-      #- name: Mapping of the Service role for CodeBuild to a Kubernetes RBAC user
-        #run: kubectl edit configmaps aws-auth -n kube-system
       - name: Vérifier si le namespace "projet-devops" existe
         run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
         if: ${{ always() }}

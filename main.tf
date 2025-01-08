@@ -78,18 +78,9 @@ resource "aws_iam_role" "workernodes" {
   })
  }
  
-resource "aws_iam_role_policy_attachment" "AdministratorAccess" {
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
-  role    = aws_iam_role.workernodes.name
- }
 
  resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-  role    = aws_iam_role.workernodes.name
- }
-
- resource "aws_iam_role_policy_attachment" "SecretsManagerReadWrite" {
-  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
   role    = aws_iam_role.workernodes.name
  }
 

@@ -94,8 +94,8 @@ jobs:
         run: aws eks update-kubeconfig --name ${{env.EKS_CLUSTER_NAME}} --region
           ${{env.AWS_REGION}}
 
-      - name: Mapping of the Service role for CodeBuild to a Kubernetes RBAC user
-        run: kubectl edit configmaps aws-auth -n kube-system
+      #- name: Mapping of the Service role for CodeBuild to a Kubernetes RBAC user
+        #run: kubectl edit configmaps aws-auth -n kube-system
       - name: Vérifier si le namespace "projet-devops" existe
         run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
         if: ${{ always() }}

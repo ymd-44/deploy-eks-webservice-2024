@@ -43,15 +43,11 @@ resource "aws_iam_role" "eks-iam-role" {
  "Version" : "2012-10-17",
  "Statement" : [
   {
-   "Sid": "EKSAccessPolicy",
    "Effect" : "Allow",
    "Principal" : {
     "Service" : "eks.amazonaws.com"
    },
-   "Action": [
-        "eks:*",
-        "sts:AssumeRole"
-      ],
+   "Action": "sts:AssumeRole"
     "Resource": "*"
   }
  ]
@@ -82,6 +78,21 @@ resource "aws_iam_role" "workernodes" {
   })
  }
  
+resource "aws_iam_role_policy_attachment" "AdministratorAccess" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  role    = aws_iam_role.workernodes.name
+ }
+
+ resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role    = aws_iam_role.workernodes.name
+ }
+
+ resource "aws_iam_role_policy_attachment" "SecretsManagerReadWrite" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+  role    = aws_iam_role.workernodes.name
+ }
+
  resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role    = aws_iam_role.workernodes.name

@@ -48,13 +48,13 @@ resource "aws_iam_role" "eks-iam-role" {
     "Service" : "eks.amazonaws.com"
    },
    "Action": "sts:AssumeRole"
-    "Resource": "*"
   }
  ]
 }
 EOF
 
 }
+
 
 # Permissions attachés au role 
 resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {

@@ -4,16 +4,6 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 4.33.0"
     }
-#Installation de Helm pour la gestion des packages Kubernetes
-    helm = {
-      source  = "hashicorp/helm"
-      version = "2.12.1"
-    }
-#Installation de "kubectl"
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "2.26.0"
-    }
   }
   required_version = ">= 1.2.0"
 }
@@ -79,27 +69,27 @@ resource "aws_iam_role" "workernodes" {
  }
  
 
- resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
+ resource "aws_iam_role_policy_attachment" "nodes-AmazonEBSCSIDriverPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
   role    = aws_iam_role.workernodes.name
  }
 
- resource "aws_iam_role_policy_attachment" "AmazonEKSWorkerNodePolicy" {
+ resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role    = aws_iam_role.workernodes.name
  }
  
- resource "aws_iam_role_policy_attachment" "AmazonEKS_CNI_Policy" {
+ resource "aws_iam_role_policy_attachment" "nodes-AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role    = aws_iam_role.workernodes.name
  }
  
- resource "aws_iam_role_policy_attachment" "EC2InstanceProfileForImageBuilderECRContainerBuilds" {
+ resource "aws_iam_role_policy_attachment" "nodes-EC2InstanceProfileForImageBuilderECRContainerBuilds" {
   policy_arn = "arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilderECRContainerBuilds"
   role    = aws_iam_role.workernodes.name
  }
  
- resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
+ resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   role    = aws_iam_role.workernodes.name
  }

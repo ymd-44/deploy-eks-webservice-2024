@@ -93,6 +93,9 @@ jobs:
       - name: Update kube config
         run: aws eks update-kubeconfig --name ${{env.EKS_CLUSTER_NAME}} --region
           ${{env.AWS_REGION}}
+
+      - name: Copie du cluster dans la configuration Kubernetes (connection to the server localhost:8080 was refused)
+        run: cp ~/.kube/eksctl/clusters/${{env.EKS_CLUSTER_NAME}} ~/.kube/config
       - name: Vérifier si le namespace "projet-devops" existe
         run: kubectl get namespace | grep ${{env.MY_NAMESPACE}}
         if: ${{ always() }}

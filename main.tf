@@ -43,11 +43,16 @@ resource "aws_iam_role" "eks-iam-role" {
  "Version" : "2012-10-17",
  "Statement" : [
   {
+   "Sid": "EKSAccessPolicy",
    "Effect" : "Allow",
    "Principal" : {
     "Service" : "eks.amazonaws.com"
    },
-   "Action": "sts:AssumeRole"
+   "Action": [
+        "eks:*",
+        "sts:AssumeRole"
+      ],
+    "Resource": "*"
   }
  ]
 }

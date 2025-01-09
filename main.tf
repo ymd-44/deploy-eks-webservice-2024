@@ -35,7 +35,7 @@ resource "aws_iam_role" "eks-iam-role" {
   {
    "Effect" : "Allow",
    "Principal" : {
-    "Service" : "eks.amazonaws.com"
+    "Service" : "ec2.amazonaws.com"
    },
    "Action": "sts:AssumeRole"
   }

@@ -52,6 +52,11 @@ resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
  role    = aws_iam_role.eks-iam-role.name
 }
 
+resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
+ policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+ role    = aws_iam_role.eks-iam-role.name
+}
+
 # Permissions attachés au nœud de travail EKS.
 resource "aws_iam_role" "workernodes" {
   name = "eks-node-group-devops24"
@@ -68,11 +73,6 @@ resource "aws_iam_role" "workernodes" {
   })
  }
  
-
- resource "aws_iam_role_policy_attachment" "nodes-AmazonEBSCSIDriverPolicy" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-  role    = aws_iam_role.workernodes.name
- }
 
  resource "aws_iam_role_policy_attachment" "nodes-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
@@ -98,7 +98,7 @@ resource "aws_iam_role" "workernodes" {
 # Création d’un cluster EKS
 resource "aws_eks_cluster" "eks-devops24" {
  name = "eks-devops24-cluster"
- role_arn = aws_iam_role.eks-iam-role.arn
+ role_arn = aws_iam_role.workernodes.arn
  version  = "1.31"
 
  access_config {
@@ -110,7 +110,7 @@ resource "aws_eks_cluster" "eks-devops24" {
  }
 
  depends_on = [
-  aws_iam_role.eks-iam-role, aws_iam_role_policy_attachment.AmazonEKSClusterPolicy,
+  aws_iam_role.workernodes, aws_iam_role_policy_attachment.AmazonEKSClusterPolicy, aws_iam_role_policy_attachment.AmazonEBSCSIDriverPolicy
  ]
 }
 

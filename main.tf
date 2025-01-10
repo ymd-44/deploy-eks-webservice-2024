@@ -98,7 +98,7 @@ resource "aws_iam_role" "workernodes" {
 # Création d’un cluster EKS
 resource "aws_eks_cluster" "eks-devops24" {
  name = "eks-devops24-cluster"
- role_arn = aws_iam_role.workernodes.arn
+ role_arn = aws_iam_role.eks-iam-role.arn
  version  = "1.31"
 
  access_config {
@@ -110,7 +110,7 @@ resource "aws_eks_cluster" "eks-devops24" {
  }
 
  depends_on = [
-  aws_iam_role.eks-iam-role, aws_iam_role_policy_attachment.AmazonEKSClusterPolicy, aws_iam_role_policy_attachment.AmazonEBSCSIDriverPolicy
+  aws_iam_role.eks-iam-role,
  ]
 }
 

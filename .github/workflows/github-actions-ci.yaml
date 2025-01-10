@@ -13,69 +13,69 @@ env:
   CONFIG_DIRECTORY: "./"
 
 jobs:
-  terraform:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
-      - name: Upload Configuration
-        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: plan-upload
-        with:
-          workspace: ${{ env.GITLAB_WORKSPACE }}
-          directory: ${{ env.CONFIG_DIRECTORY }}
-          speculative: true
-      - name: Create Plan Run
-        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
-        id: plan-run
-        with:
-          workspace: ${{ env.GITLAB_WORKSPACE }}
-          configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
-          plan_only: true
-      - name: Get Plan Output
-        uses: hashicorp/tfc-workflows-github/actions/plan-output@v1.0.0
-        id: plan-output
-        with:
-          plan: ${{ fromJSON(steps.plan-run.outputs.payload).data.relationships.plan.data.id }}
+  # terraform:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Code Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Upload Configuration
+  #       uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+  #       id: plan-upload
+  #       with:
+  #         workspace: ${{ env.GITLAB_WORKSPACE }}
+  #         directory: ${{ env.CONFIG_DIRECTORY }}
+  #         speculative: true
+  #     - name: Create Plan Run
+  #       uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+  #       id: plan-run
+  #       with:
+  #         workspace: ${{ env.GITLAB_WORKSPACE }}
+  #         configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
+  #         plan_only: true
+  #     - name: Get Plan Output
+  #       uses: hashicorp/tfc-workflows-github/actions/plan-output@v1.0.0
+  #       id: plan-output
+  #       with:
+  #         plan: ${{ fromJSON(steps.plan-run.outputs.payload).data.relationships.plan.data.id }}
 
-      - name: Upload Configuration
-        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: apply-upload
-        with:
-          workspace: ${{ env.GITLAB_WORKSPACE }}
-          directory: ${{ env.CONFIG_DIRECTORY }}
-      - name: Create Apply Run
-        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
-        id: apply-run
-        with:
-          workspace: ${{ env.GITLAB_WORKSPACE }}
-          configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
-      - name: Apply
-        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
-        if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
-        id: apply
-        with:
-          run: ${{ steps.apply-run.outputs.run_id }}
-          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
-  development:
-    needs: terraform
-    runs-on: ubuntu-latest
-    steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
-      - name: Build Docker image
-        run: docker build -t my_image:latest .
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Tag image
-        run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME}}/my_image:latest
-      - name: Push Docker image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
+  #     - name: Upload Configuration
+  #       uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+  #       id: apply-upload
+  #       with:
+  #         workspace: ${{ env.GITLAB_WORKSPACE }}
+  #         directory: ${{ env.CONFIG_DIRECTORY }}
+  #     - name: Create Apply Run
+  #       uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+  #       id: apply-run
+  #       with:
+  #         workspace: ${{ env.GITLAB_WORKSPACE }}
+  #         configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
+  #     - name: Apply
+  #       uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
+  #       if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
+  #       id: apply
+  #       with:
+  #         run: ${{ steps.apply-run.outputs.run_id }}
+  #         comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
+  # development:
+  #   needs: terraform
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Code Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Build Docker image
+  #       run: docker build -t my_image:latest .
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v1
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     - name: Tag image
+  #       run: docker tag my_image:latest ${{ secrets.DOCKERHUB_USERNAME}}/my_image:latest
+  #     - name: Push Docker image
+  #       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_image:latest
   production:
-    needs: terraform
+    # needs: terraform
     runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
@@ -83,7 +83,7 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v2.0
         with:
-          version: v1.31.2
+          version: v1.24.0
         id: install
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

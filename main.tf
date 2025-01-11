@@ -57,6 +57,7 @@ resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
  role    = aws_iam_role.eks-iam-role.name
 }
 
+
 # Permissions attachés au nœud de travail EKS.
 resource "aws_iam_role" "workernodes" {
   name = "eks-node-group-devops24"
@@ -99,7 +100,7 @@ resource "aws_iam_role" "workernodes" {
 resource "aws_eks_cluster" "eks-devops24" {
  name = "eks-devops24-cluster"
  role_arn = aws_iam_role.eks-iam-role.arn
- version  = "1.31"
+ version  = "1.30"
 
  access_config {
     authentication_mode = "API"
@@ -112,6 +113,14 @@ resource "aws_eks_cluster" "eks-devops24" {
  depends_on = [
   aws_iam_role.eks-iam-role,
  ]
+}
+
+#Access entires AWS/k8s
+resource "aws_eks_access_entry" "user-iam" {
+  cluster_name      = aws_eks_cluster.eks-devops24.name
+  principal_arn     = "arn:aws:iam::793599617947:user/user-iam"
+  kubernetes_groups = ["group-1", "group-2"]
+  type              = "STANDARD"
 }
 
 #New : Création des nœuds de travail pour le cluster

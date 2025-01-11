@@ -5,7 +5,8 @@ on:
       - main
 env:
   AWS_REGION: us-east-1
-  EKS_CLUSTER_NAME: eks-devops24-cluster
+  #EKS_CLUSTER_NAME: eks-devops24-cluster
+  EKS_CLUSTER_NAME: eks-devops25
   MY_NAMESPACE: projet-devops
   TF_CLOUD_ORGANIZATION: tf-devops24
   TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}

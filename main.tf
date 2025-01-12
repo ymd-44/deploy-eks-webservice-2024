@@ -125,6 +125,30 @@ resource "aws_eks_access_entry" "user-iam" {
 
 #ConfigMap pour garantir la connexion entre IAM user/role & K8s Role/ClusterRole.
 #Error from server (Forbidden): namespaces is forbidden
+
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version = "~> 20.0"
+
+  manage_aws_auth_configmap = true
+
+  aws_auth_roles = [
+    {
+      rolearn  = aws_iam_role.eks-iam-role.arn
+      username = aws_iam_role.eks-iam-role.name
+      groups   = ["system:masters"]
+    },
+  ]
+
+  aws_auth_users = [
+    {
+      userarn  = "arn:aws:iam::793599617947:user/user-iam"
+      username = "user-iam"
+      groups   = ["system:masters"]
+    }
+  ]
+}
+
 resource "kubernetes_cluster_role_v1" "eks_role" {
   metadata {
     name = "eks-role-devops24"
@@ -153,6 +177,7 @@ resource "kubernetes_cluster_role_binding_v1" "eks_role_binding" {
     name = "admin"
   }
 }
+
 
 #New : Création des nœuds de travail pour le cluster
 resource "aws_eks_node_group" "worker-node-group" {

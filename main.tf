@@ -33,7 +33,7 @@ provider "kubernetes" {
   }
   host                   = aws_eks_cluster.eks-devops24.endpoint
   cluster_ca_certificate = base64decode(aws_eks_cluster.eks-devops24.certificate_authority.0.data)
-  token                  = aws_eks_cluster_auth.eks-devops24.token
+  token                  = aws_eks_cluster.eks-devops24.token
 }
 
 #Utilisateur IAM : Configurez la première ressource pour le rôle IAM.

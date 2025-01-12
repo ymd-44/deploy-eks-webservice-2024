@@ -49,14 +49,6 @@ resource "aws_eks_cluster" "eks-devops24" {
  ]
 }
 
-#Access entires AWS/k8s
-resource "aws_eks_access_entry" "user-iam" {
-  cluster_name      = aws_eks_cluster.eks-devops24.name
-  principal_arn     = "arn:aws:iam::793599617947:user/user-iam"
-  kubernetes_groups = ["group-1", "group-2"]
-  type              = "STANDARD"
-}
-
 #Utilisateur IAM : Configurez la première ressource pour le rôle IAM.
 resource "aws_iam_role" "eks-iam-role" {
     name = "eks-devops24-iam-role"

@@ -149,36 +149,6 @@ module "eks" {
   ]
 }
 
-resource "kubernetes_cluster_role_v1" "eks_role" {
-  metadata {
-    name = "eks-role-devops24"
-  }
-
-  rule {
-    api_groups = [""]
-    resources  = ["namespaces"]
-    verbs      = ["get", "list"]
-  }
-}
-
-resource "kubernetes_cluster_role_binding_v1" "eks_role_binding" {
-  metadata {
-    name = "eks-role-devops24-binding"
-  }
-
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.eks_role.metadata[0].name
-  }
-
-  subject {
-    kind = "User"
-    name = "admin"
-  }
-}
-
-
 #New : Création des nœuds de travail pour le cluster
 resource "aws_eks_node_group" "worker-node-group" {
   cluster_name  = aws_eks_cluster.eks-devops24.name

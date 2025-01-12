@@ -27,13 +27,34 @@ provider "aws" {
   }
 }
 
-provider "kubernetes" {
-  experiments {
-    manifest_resource = true
+# Création d’un cluster EKS
+resource "aws_eks_cluster" "eks-devops24" {
+ name = "eks-devops24-cluster"
+ role_arn = aws_iam_role.eks-iam-role.arn
+ version  = "1.30"
+
+ access_config {
+    authentication_mode = "API"
+    bootstrap_cluster_creator_admin_permissions = true
   }
-  host                   = aws_eks_cluster.eks-devops24.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.eks-devops24.certificate_authority.0.data)
-  token                  = aws_eks_cluster.eks-devops24.token
+
+ vpc_config {
+  endpoint_private_access = false
+  endpoint_public_access  = true
+  subnet_ids = [var.subnet_id_1, var.subnet_id_2]
+ }
+
+ depends_on = [
+  aws_iam_role.eks-iam-role,
+ ]
+}
+
+#Access entires AWS/k8s
+resource "aws_eks_access_entry" "user-iam" {
+  cluster_name      = aws_eks_cluster.eks-devops24.name
+  principal_arn     = "arn:aws:iam::793599617947:user/user-iam"
+  kubernetes_groups = ["group-1", "group-2"]
+  type              = "STANDARD"
 }
 
 #Utilisateur IAM : Configurez la première ressource pour le rôle IAM.
@@ -63,11 +84,6 @@ EOF
 # Permissions attachés au role 
 resource "aws_iam_role_policy_attachment" "AmazonEKSClusterPolicy" {
  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
- role    = aws_iam_role.eks-iam-role.name
-}
-
-resource "aws_iam_role_policy_attachment" "AmazonEBSCSIDriverPolicy" {
- policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
  role    = aws_iam_role.eks-iam-role.name
 }
 
@@ -110,107 +126,25 @@ resource "aws_iam_role" "workernodes" {
  }
 
 
-# Création d’un cluster EKS
-resource "aws_eks_cluster" "eks-devops24" {
- name = "eks-devops24-cluster"
- role_arn = aws_iam_role.eks-iam-role.arn
- version  = "1.30"
-
- access_config {
-    authentication_mode = "API"
-  }
-
- vpc_config {
-  subnet_ids = [var.subnet_id_1, var.subnet_id_2]
- }
-
- depends_on = [
-  aws_iam_role.eks-iam-role,
- ]
-}
-
-#Access entires AWS/k8s
-resource "aws_eks_access_entry" "user-iam" {
-  cluster_name      = aws_eks_cluster.eks-devops24.name
-  principal_arn     = "arn:aws:iam::793599617947:user/user-iam"
-  kubernetes_groups = ["group-1", "group-2"]
-  type              = "STANDARD"
-}
-
-#ConfigMap pour garantir la connexion entre IAM user/role & K8s Role/ClusterRole.
-#Error from server (Forbidden): namespaces is forbidden
-
-module "eks" {
-  source  = "terraform-aws-modules/eks/aws//modules/aws-auth"
-  version = "~> 20.0"
-
-  manage_aws_auth_configmap = true
-
-  aws_auth_roles = [
-    {
-      rolearn  = aws_iam_role.eks-iam-role.arn
-      username = aws_iam_role.eks-iam-role.name
-      groups   = ["system:masters"]
-    },
-  ]
-
-  aws_auth_users = [
-    {
-      userarn  = "arn:aws:iam::793599617947:user/user-iam"
-      username = "user-iam"
-      groups   = ["system:masters"]
-    }
-  ]
-}
-
-resource "kubernetes_cluster_role_v1" "eks_role" {
-  metadata {
-    name = "eks-role-devops24"
-  }
-
-  rule {
-    api_groups = [""]
-    resources  = ["namespaces"]
-    verbs      = ["get", "list"]
-  }
-}
-
-resource "kubernetes_cluster_role_binding_v1" "eks_role_binding" {
-  metadata {
-    name = "eks-role-devops24-binding"
-  }
-
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.eks_role.metadata[0].name
-  }
-
-  subject {
-    kind = "User"
-    name = "admin"
-  }
-}
-
-
 #New : Création des nœuds de travail pour le cluster
 resource "aws_eks_node_group" "worker-node-group" {
   cluster_name  = aws_eks_cluster.eks-devops24.name
   node_group_name = "eks-devops24-workernodes"
   node_role_arn  = aws_iam_role.workernodes.arn
   subnet_ids   = [var.subnet_id_1, var.subnet_id_2]
+  capacity_time = "ON_DEMAND"
   instance_types = ["m5.large"]
  
   scaling_config {
    desired_size = 1
-   max_size   = 1
-   min_size   = 1
+   max_size   = 10
+   min_size   = 0
   }
  
   depends_on = [
    aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,
    aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
-   #aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly,
+   aws_iam_role_policy_attachment.nodes-AmazonEC2ContainerRegistryReadOnly,
   ]
  }
 
